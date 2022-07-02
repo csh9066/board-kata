@@ -1,4 +1,4 @@
-package boardkata.sever.config;
+package boardkata.sever;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
