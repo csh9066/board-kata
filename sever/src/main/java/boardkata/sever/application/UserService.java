@@ -20,7 +20,7 @@ public class UserService {
         String email = userCreateDto.getEmail();
 
         if (userRepository.existsByEmail(email)) {
-            throw new UserEmailDuplicationException("이미 존재하는 이메일 입니다.");
+            throw new UserEmailDuplicationException("중복 되는 이메일 요청");
         }
 
         String rawPassword = userCreateDto.getPassword();
