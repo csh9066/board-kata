@@ -38,6 +38,8 @@ export default function SignUpPage() {
     }
   };
 
+  const [form] = Form.useForm();
+
   return (
     <AuthTemplate
       title="회원 가입"
@@ -47,7 +49,7 @@ export default function SignUpPage() {
         </Typography.Text>
       }
     >
-      <Form onFinish={onSignup}>
+      <Form onFinish={onSignup} form={form}>
         <Form.Item
           name="email"
           rules={[{ required: true, message: "이메일을 입력해주세요" }]}
@@ -73,11 +75,16 @@ export default function SignUpPage() {
           name="passwordCheck"
           rules={[
             { required: true, message: "패스워드를 입력해주세요" },
-            {
-              min: 8,
-              max: 16,
-              message: "비밀번호는 8 ~ 16 값입니다.",
-            },
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                if (!value || getFieldValue("password") === value) {
+                  return Promise.resolve();
+                }
+                return Promise.reject(
+                  new Error("패스워드가 일치하지 않습니다.")
+                );
+              },
+            }),
           ]}
         >
           <Input
