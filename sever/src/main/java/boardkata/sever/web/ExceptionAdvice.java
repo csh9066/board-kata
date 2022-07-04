@@ -1,6 +1,7 @@
 package boardkata.sever.web;
 
 import boardkata.sever.dto.ErrorResponse;
+import boardkata.sever.exception.AuthenticationException;
 import boardkata.sever.exception.UserEmailDuplicationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -15,7 +16,13 @@ public class ExceptionAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(UserEmailDuplicationException.class)
     public ErrorResponse handleUserEmailDuplicationException() {
-        return new ErrorResponse("중복된 이메일입니다. 다시 한번 확인해주세요");
+        return new ErrorResponse("중복된 이메일입니다. 다시 한번 확인해주세요.");
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(AuthenticationException.class)
+    public ErrorResponse handleAuthenticationException() {
+        return new ErrorResponse("로그인 인증에 실패했습니다. 이메일이나 패스워드를 다시 한번 확인해주세요.");
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

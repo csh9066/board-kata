@@ -68,8 +68,8 @@ class UserServiceTest {
 
         @DataJpaTest
         @Nested
-        @DisplayName("존재하는 이메일이 주어지면")
-        class Context_with_existing_email {
+        @DisplayName("이미 존재하는 이메일이 주어지면")
+        class Context_with_already_existing_email {
             UserCreateDto userCreateDto;
 
             @BeforeEach

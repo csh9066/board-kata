@@ -1,9 +1,9 @@
 package boardkata.sever.web;
 
-import boardkata.sever.application.UserService;
-import boardkata.sever.dto.user.UserCreateDto;
-import boardkata.sever.dto.user.UserDto;
-import boardkata.sever.exception.UserEmailDuplicationException;
+import boardkata.sever.application.AuthService;
+import boardkata.sever.dto.auth.AuthenticationResult;
+import boardkata.sever.dto.auth.LoginDto;
+import boardkata.sever.exception.AuthenticationException;
 import boardkata.sever.securituy.WebSecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,20 +18,18 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ImportAutoConfiguration(WebSecurityConfig.class)
 @AutoConfigureRestDocs
-@WebMvcTest(UserController.class)
-class UserControllerTest {
+@WebMvcTest(AuthController.class)
+class AuthControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -40,83 +38,77 @@ class UserControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private UserService userService;
+    private AuthService authService;
 
     @Nested
-    @DisplayName("POST /users 요청은")
-    class Describe_signup {
+    @DisplayName("POST /login 요청은")
+    class Describe_login {
 
         @Nested
-        @DisplayName("올바른 요청값들이 주어지면")
-        class Context_with_valid_request_values {
-            UserCreateDto userCreateDto;
+        @DisplayName("올바른 요청 값들이 주어지면")
+        class Context_with_right_request_values {
+            LoginDto loginDto;
 
             @BeforeEach
             void setUp() {
-                userCreateDto = UserCreateDto.builder()
-                        .email("kimchi123@naver.com")
+                loginDto = LoginDto.builder()
+                        .email("kimchi@1234")
                         .password("12345678")
                         .build();
 
-                given(userService.signup(any(UserCreateDto.class)))
-                        .willReturn(
-                                UserDto.builder()
-                                        .id(1L)
-                                        .email("kimchi123@naver.com")
-                                        .build()
-                        );
+                AuthenticationResult authenticationResult =
+                        AuthenticationResult.builder()
+                                .id(1L)
+                                .build();
 
+                given(authService.authenticate(eq(loginDto)))
+                        .willReturn(authenticationResult);
             }
 
             @Test
-            @DisplayName("생성된 유저를 응답한다.")
-            void it_responses_created_user() throws Exception {
+            @DisplayName("204 status를 응답한다.")
+            void it_responses_204_status() throws Exception {
                 mockMvc.perform(
-                                post("/users")
+                                post("/login")
+                                        .content(objectMapper.writeValueAsString(loginDto))
                                         .contentType(MediaType.APPLICATION_JSON)
-                                        .content(objectMapper.writeValueAsString(userCreateDto))
                         )
-                        .andExpect(status().isCreated())
-                        .andDo(document("sign-up",
+                        .andExpect(status().isNoContent())
+                        .andDo(document("login",
                                 requestFields(
                                         fieldWithPath("email").description("이메일"),
                                         fieldWithPath("password").description("패스워드")
-                                ),
-                                responseFields(
-                                        fieldWithPath("id").description("아이디"),
-                                        fieldWithPath("email").description("이메일")
                                 )
                         ));
             }
         }
 
         @Nested
-        @DisplayName("중복된 이메일이 주어지면")
-        class Context_with_duplicate_email {
-            UserCreateDto userCreateDto;
+        @DisplayName("로그인 인증에 실패하면")
+        class Context_when_failure_login {
+            LoginDto loginDto;
 
             @BeforeEach
             void setUp() {
-                userCreateDto = UserCreateDto.builder()
-                        .email("jungbok123@naver.com")
-                        .password("123456")
+                loginDto = LoginDto.builder()
+                        .email("xxxx123@naver.com")
+                        .password("12345678")
                         .build();
 
-                given(userService.signup(eq(userCreateDto)))
-                        .willThrow(UserEmailDuplicationException.class);
+                given(authService.authenticate(eq(loginDto)))
+                        .willThrow(AuthenticationException.class);
             }
 
             @Test
-            @DisplayName("400 상태를 응답한다.")
-            void it_responses_400_status() throws Exception {
+            @DisplayName("400 status를 응답한다.")
+            void it_responses_204_status() throws Exception {
                 mockMvc.perform(
-                                post("/users")
+                                post("/login")
+                                        .content(objectMapper.writeValueAsString(loginDto))
                                         .contentType(MediaType.APPLICATION_JSON)
-                                        .content(objectMapper.writeValueAsString(userCreateDto))
                         )
                         .andExpect(status().isBadRequest());
             }
         }
     }
-
 }
