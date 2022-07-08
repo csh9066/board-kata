@@ -2,9 +2,9 @@ package boardkata.sever.application;
 
 import boardkata.sever.domain.user.User;
 import boardkata.sever.domain.user.UserRepository;
-import boardkata.sever.dto.auth.AuthenticationResult;
 import boardkata.sever.dto.auth.LoginDto;
 import boardkata.sever.exception.AuthenticationException;
+import boardkata.sever.securituy.UserPrincipal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -58,17 +58,22 @@ class AuthServiceTest {
                 userId = savedUser.getId();
 
                 loginDto = LoginDto.builder()
-                        .email(savedUser.getEmail())
+                        .email("test123@naver.com")
                         .password("12345678")
                         .build();
             }
 
             @Test
-            @DisplayName("AuthenticateResult를 반환한다.")
+            @DisplayName("AuthUser를 반환한다.")
             void it_returns_AuthenticateResult() {
-                AuthenticationResult authenticationResult = authService.authenticate(loginDto);
+                UserPrincipal userPrincipal = authService.authenticate(loginDto);
 
-                assertThat(authenticationResult.getId()).isEqualTo(userId);
+                assertThat(userPrincipal.getId()).isEqualTo(userId);
+                assertThat(userPrincipal.getAuthorities())
+                        .extractingResultOf("getAuthority")
+                        .contains("ROLE_USER");
+                assertThat(userPrincipal.getUsername()).isEqualTo("test123@naver.com");
+                assertThat(userPrincipal.getPassword()).isNotEqualTo("12345678");
             }
         }
 

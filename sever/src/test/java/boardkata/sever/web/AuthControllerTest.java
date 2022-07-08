@@ -1,9 +1,9 @@
 package boardkata.sever.web;
 
 import boardkata.sever.application.AuthService;
-import boardkata.sever.dto.auth.AuthenticationResult;
 import boardkata.sever.dto.auth.LoginDto;
 import boardkata.sever.exception.AuthenticationException;
+import boardkata.sever.securituy.UserPrincipal;
 import boardkata.sever.securituy.WebSecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,13 +56,14 @@ class AuthControllerTest {
                         .password("12345678")
                         .build();
 
-                AuthenticationResult authenticationResult =
-                        AuthenticationResult.builder()
-                                .id(1L)
-                                .build();
+                UserPrincipal userPrincipal = UserPrincipal.builder()
+                        .id(1L)
+                        .email("kimchi@1234")
+                        .password("12345678")
+                        .build();
 
                 given(authService.authenticate(eq(loginDto)))
-                        .willReturn(authenticationResult);
+                        .willReturn(userPrincipal);
             }
 
             @Test
