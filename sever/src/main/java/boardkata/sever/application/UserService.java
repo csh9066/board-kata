@@ -4,6 +4,7 @@ import boardkata.sever.domain.user.User;
 import boardkata.sever.domain.user.UserRepository;
 import boardkata.sever.dto.user.UserCreateDto;
 import boardkata.sever.dto.user.UserDto;
+import boardkata.sever.exception.ResourceNotFoundException;
 import boardkata.sever.exception.UserEmailDuplicationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,9 +35,13 @@ public class UserService {
 
         userRepository.save(user);
 
-        return UserDto.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .build();
+        return UserDto.of(user);
+    }
+
+    public UserDto getUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("user","id", id));
+
+        return UserDto.of(user);
     }
 }
