@@ -26,7 +26,9 @@ public class AuthController {
         UserPrincipal userPrincipal = authService.authenticate(loginDto);
 
         UsernamePasswordAuthenticationToken authenticationToken
-                = new UsernamePasswordAuthenticationToken(userPrincipal, null, userPrincipal.getAuthorities());
+                = UsernamePasswordAuthenticationToken.authenticated(userPrincipal,
+                userPrincipal.getPassword(),
+                userPrincipal.getAuthorities());
 
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
     }
