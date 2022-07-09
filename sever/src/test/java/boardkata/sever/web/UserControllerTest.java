@@ -171,11 +171,11 @@ class UserControllerTest {
         class Context_with_not_authenticated_user {
 
             @WithAnonymousUser
-            @DisplayName("403 status를 응답한다.")
+            @DisplayName("401 status를 응답한다.")
             @Test
-            void it_responses_403_status() throws Exception {
+            void it_responses_401_status() throws Exception {
                 mockMvc.perform(get("/users/me"))
-                        .andExpect(status().isForbidden());
+                        .andExpect(status().isUnauthorized());
             }
         }
     }

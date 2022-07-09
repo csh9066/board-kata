@@ -35,7 +35,7 @@ public class ExceptionAdvice {
         bindingResult.getFieldErrors()
                 .stream()
                 .forEach((fieldError -> {
-                    response.addError(fieldError.getDefaultMessage());
+                    response.addMessage(fieldError.getDefaultMessage());
                 }));
 
         return response;
