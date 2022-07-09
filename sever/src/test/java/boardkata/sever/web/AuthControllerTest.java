@@ -5,6 +5,7 @@ import boardkata.sever.dto.auth.LoginDto;
 import boardkata.sever.exception.AuthenticationException;
 import boardkata.sever.securituy.UserPrincipal;
 import boardkata.sever.securituy.WebSecurityConfig;
+import boardkata.sever.security.WithMockAuthUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,10 +22,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
+import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ImportAutoConfiguration(WebSecurityConfig.class)
@@ -68,7 +71,7 @@ class AuthControllerTest {
             }
 
             @Test
-            @DisplayName("204 status를 응답한다.")
+            @DisplayName("204 status와 인증이 완료 된다.")
             void it_responses_204_status() throws Exception {
                 mockMvc.perform(
                                 post("/login")
@@ -114,4 +117,24 @@ class AuthControllerTest {
             }
         }
     }
+
+    @Nested
+    @DisplayName("GET /logout 요청은")
+    class Describe_logout {
+
+        @Nested
+        @DisplayName("인증된 사용자 요청이 오면")
+        class Context_with_authenticated_user {
+
+            @WithMockAuthUser
+            @DisplayName("204 status와 인증을 만료시킨다.")
+            @Test
+            void it_responses_204_status() throws Exception {
+                mockMvc.perform(get("/logout"))
+                        .andExpect(status().isNoContent())
+                        .andExpect(unauthenticated());
+            }
+        }
+    }
+
 }
