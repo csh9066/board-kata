@@ -1,6 +1,6 @@
 import { Button, Form, Input, message } from "antd";
-import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import { login } from "../api/auth";
 import AuthTemplate from "../components/AuthTemplate";
 
 type LoginForm = {
@@ -13,7 +13,7 @@ export default function LoginPage() {
 
   const onLogin = async (form: LoginForm) => {
     try {
-      await axios.post("http://localhost:8080/login", form);
+      await login(form.email, form.password);
       navigate("/");
     } catch (e: any) {
       if (e?.response?.data.message) {

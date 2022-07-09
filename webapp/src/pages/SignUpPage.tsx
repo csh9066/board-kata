@@ -1,17 +1,14 @@
 import { Button, Form, Input, message, Typography } from "antd";
-import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import { createUser } from "../api/users";
 import AuthTemplate from "../components/AuthTemplate";
+import { CreateUserData } from "../types";
 
 type SignUpForm = {
   email: string;
   password: string;
   passwordCheck: string;
-};
-
-type SignupData = {
-  email: string;
-  password: string;
+  nickname: string;
 };
 
 export default function SignUpPage() {
@@ -19,14 +16,16 @@ export default function SignUpPage() {
 
   const onSignup = async (form: SignUpForm) => {
     try {
-      const signupData: SignupData = {
+      const signupData: CreateUserData = {
         email: form.email,
         password: form.password,
+        nickname: form.nickname,
       };
 
-      await axios.post("http://localhost:8080/users", signupData);
+      await createUser(signupData);
 
       message.success("회원가입 성공");
+
       navigate("/login");
     } catch (e: any) {
       if (e?.response?.data.message) {
@@ -87,11 +86,14 @@ export default function SignUpPage() {
             }),
           ]}
         >
-          <Input
-            size="large"
-            type="password"
-            placeholder="패스워드 체크"
-          ></Input>
+          <Input size="large" type="password" placeholder="패스워드 체크" />
+        </Form.Item>
+
+        <Form.Item
+          name="nickname"
+          rules={[{ required: true, message: "닉네임을 입력해주세요" }]}
+        >
+          <Input size="large" type="text" placeholder="닉네임" />
         </Form.Item>
 
         <Button block type="primary" size="large" htmlType="submit">
