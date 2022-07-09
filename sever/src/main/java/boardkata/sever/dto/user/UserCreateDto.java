@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 @EqualsAndHashCode
@@ -18,11 +19,16 @@ public class UserCreateDto {
     @Size(min = 8, max = 16)
     private final String password;
 
+    @NotEmpty
+    private final String nickname;
+
     @Builder
     @JsonCreator
     public UserCreateDto(@JsonProperty("email") String email,
-                         @JsonProperty("password")String password) {
+                         @JsonProperty("password") String password,
+                         @JsonProperty("nickname") String nickname) {
         this.email = email;
         this.password = password;
+        this.nickname = nickname;
     }
 }

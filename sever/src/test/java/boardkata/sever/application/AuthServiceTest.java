@@ -25,7 +25,7 @@ class AuthServiceTest {
     @Autowired
     private UserRepository userRepository;
 
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void setUp() {
@@ -50,6 +50,7 @@ class AuthServiceTest {
                 User user = User.builder()
                         .email("test123@naver.com")
                         .password(passwordEncoder.encode("12345678"))
+                        .nickname("test")
                         .build();
 
 
@@ -110,6 +111,7 @@ class AuthServiceTest {
                 User user = User.builder()
                         .email("test123@naver.com")
                         .password(passwordEncoder.encode("12345678"))
+                        .nickname("test")
                         .build();
 
 

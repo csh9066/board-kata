@@ -52,6 +52,7 @@ class UserServiceTest {
                 userCreateDto = UserCreateDto.builder()
                         .email("babo123@naver.com")
                         .password("12345678")
+                        .nickname("babo")
                         .build();
             }
 
@@ -62,6 +63,7 @@ class UserServiceTest {
 
                 assertThat(userDto.getId()).isNotNull();
                 assertThat(userDto.getEmail()).isEqualTo("babo123@naver.com");
+                assertThat(userDto.getNickname()).isEqualTo("babo");
 
                 verify(passwordEncoder).encode("12345678");
             }
@@ -78,6 +80,7 @@ class UserServiceTest {
                 final User user = User.builder()
                         .email("babo1234@naver.com")
                         .password("12345567")
+                        .nickname("babo")
                         .build();
 
                 userRepository.save(user);
@@ -85,6 +88,7 @@ class UserServiceTest {
                 userCreateDto = UserCreateDto.builder()
                         .email("babo1234@naver.com")
                         .password("13123123")
+                        .nickname("babo123")
                         .build();
             }
 
@@ -112,6 +116,7 @@ class UserServiceTest {
                 User user = User.builder()
                         .email("kimchi@naver.com")
                         .password("12345678")
+                        .nickname("kimchi")
                         .build();
 
                 userRepository.save(user);

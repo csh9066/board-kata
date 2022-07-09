@@ -21,11 +21,16 @@ public class User {
 
     private String password;
 
+    private String nickname;
+
     protected User() {}
 
     @Builder
-    private User(@NonNull String email, @NonNull String password) {
+    private User(@NonNull String email,
+                 @NonNull String password,
+                 @NonNull String nickname) {
         this.email = email;
         this.password = password;
+        this.nickname = nickname;
     }
 }

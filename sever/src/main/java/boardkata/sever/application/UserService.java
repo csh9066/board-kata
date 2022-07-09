@@ -31,6 +31,7 @@ public class UserService {
         User user = User.builder()
                 .email(email)
                 .password(encodedPassword)
+                .nickname(userCreateDto.getNickname())
                 .build();
 
         userRepository.save(user);

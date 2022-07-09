@@ -12,6 +12,7 @@ class UserTest {
         User user = User.builder()
                 .email("email12@naver.com")
                 .password("12341234")
+                .nickname("eamil123")
                 .build();
 
         assertThat(user.getEmail()).isEqualTo("email12@naver.com");

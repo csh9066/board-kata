@@ -62,6 +62,7 @@ class UserControllerTest {
                 userCreateDto = UserCreateDto.builder()
                         .email("kimchi123@naver.com")
                         .password("12345678")
+                        .nickname("kimchi")
                         .build();
 
                 given(userService.signup(any(UserCreateDto.class)))
@@ -69,6 +70,7 @@ class UserControllerTest {
                                 UserDto.builder()
                                         .id(1L)
                                         .email("kimchi123@naver.com")
+                                        .nickname("kimchi")
                                         .build()
                         );
 
@@ -86,11 +88,13 @@ class UserControllerTest {
                         .andDo(document("sign-up",
                                 requestFields(
                                         fieldWithPath("email").description("이메일"),
-                                        fieldWithPath("password").description("패스워드")
+                                        fieldWithPath("password").description("패스워드"),
+                                        fieldWithPath("nickname").description("닉네임")
                                 ),
                                 responseFields(
                                         fieldWithPath("id").description("아이디"),
-                                        fieldWithPath("email").description("이메일")
+                                        fieldWithPath("email").description("이메일"),
+                                        fieldWithPath("nickname").description("닉네임")
                                 )
                         ));
             }
@@ -106,6 +110,7 @@ class UserControllerTest {
                 userCreateDto = UserCreateDto.builder()
                         .email("jungbok123@naver.com")
                         .password("123456")
+                        .nickname("junbok")
                         .build();
 
                 given(userService.signup(eq(userCreateDto)))
@@ -140,6 +145,7 @@ class UserControllerTest {
                                 UserDto.builder()
                                         .email("asdasd@naver.com")
                                         .id(2L)
+                                        .nickname("babo")
                                         .build()
                         );
             }
@@ -151,10 +157,11 @@ class UserControllerTest {
                 mockMvc.perform(get("/users/me"))
                         .andExpect(status().isOk())
                         .andDo(document("get-me",
-                            responseFields(
-                                fieldWithPath("id").description("아이디"),
-                                fieldWithPath("email").description("이메일")
-                            )
+                                responseFields(
+                                        fieldWithPath("id").description("아이디"),
+                                        fieldWithPath("email").description("이메일"),
+                                        fieldWithPath("nickname").description("닉네임")
+                                )
                         ));
             }
         }
