@@ -24,6 +24,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ImportAutoConfiguration(WebSecurityConfig.class)
@@ -75,6 +76,7 @@ class AuthControllerTest {
                                         .contentType(MediaType.APPLICATION_JSON)
                         )
                         .andExpect(status().isNoContent())
+                        .andExpect(authenticated().withUsername("kimchi@1234"))
                         .andDo(document("login",
                                 requestFields(
                                         fieldWithPath("email").description("이메일"),
