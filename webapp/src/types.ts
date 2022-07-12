@@ -9,3 +9,8 @@ export interface CreateUserData {
   password: string;
   nickname: string;
 }
+
+export interface ErrorResponse {
+  error: string;
+  messages: string[];
+}

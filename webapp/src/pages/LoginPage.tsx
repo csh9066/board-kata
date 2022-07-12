@@ -2,6 +2,7 @@ import { Button, Form, Input, message } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../api/auth";
 import AuthTemplate from "../components/AuthTemplate";
+import { DefinedError } from "../api/resolveAxiosError";
 
 type LoginForm = {
   email: string;
@@ -15,13 +16,10 @@ export default function LoginPage() {
     try {
       await login(form.email, form.password);
       navigate("/");
-    } catch (e: any) {
-      if (e?.response?.data.message) {
-        message.error(e?.response?.data.message);
-        return;
+    } catch (e) {
+      if (e instanceof DefinedError) {
+        message.error(e.data.error);
       }
-
-      console.error(e);
     }
   };
 

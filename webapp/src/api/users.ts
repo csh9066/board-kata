@@ -1,12 +1,21 @@
 import { CreateUserData } from "../types";
+import resolveAxiosError from "./resolveAxiosError";
 import api from "./api";
 
 export async function getMe() {
-  const { data } = await api.get("/users/me");
-  return data;
+  try {
+    const { data } = await api.get("/users/me");
+    return data;
+  } catch (e) {
+    resolveAxiosError(e as Error, "로그인 요청 에러");
+  }
 }
 
 export async function createUser(form: CreateUserData) {
-  const { data } = await api.post("/users", form);
-  return data;
+  try {
+    const { data } = await api.post("/users", form);
+    return data;
+  } catch (e) {
+    resolveAxiosError(e as Error, "로그인 요청 에러");
+  }
 }

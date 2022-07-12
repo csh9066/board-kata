@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { createUser } from "../api/users";
 import AuthTemplate from "../components/AuthTemplate";
 import { CreateUserData } from "../types";
+import { DefinedError } from "../api/resolveAxiosError";
 
 type SignUpForm = {
   email: string;
@@ -27,13 +28,10 @@ export default function SignUpPage() {
       message.success("회원가입 성공");
 
       navigate("/login");
-    } catch (e: any) {
-      if (e?.response?.data.message) {
-        message.error(e?.response?.data.message);
-        return;
+    } catch (e) {
+      if (e instanceof DefinedError) {
+        message.error(e.data.error);
       }
-
-      console.error(e);
     }
   };
 
