@@ -33,8 +33,8 @@ class BoardRepositoryTest {
 
         // then
         assertThat(board.getId()).isNotNull();
-        assertThat(board.getCreatedAt()).isAfter(postSaveTime);
-        assertThat(board.getUpdatedAt()).isAfter(postSaveTime);
+        assertThat(board.getCreatedAt()).isAfterOrEqualTo(postSaveTime);
+        assertThat(board.getUpdatedAt()).isAfterOrEqualTo(postSaveTime);
     }
 
     @Test
