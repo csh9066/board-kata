@@ -1,6 +1,5 @@
 package boardkata.sever;
 
-import boardkata.sever.domain.board.Board;
 import boardkata.sever.domain.user.User;
 
 public class Fixtures {

@@ -7,7 +7,7 @@ import boardkata.sever.domain.user.UserRepository;
 import boardkata.sever.dto.board.BoardCommandDto;
 import boardkata.sever.dto.board.BoardDto;
 import boardkata.sever.exception.ResourceNotFoundException;
-import boardkata.sever.exception.UnAuthorizedException;
+import boardkata.sever.exception.AccessDeniedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +38,7 @@ public class BoardService {
                 .orElseThrow(() -> new ResourceNotFoundException("board", "id", boardId));
 
         if (!board.getAuthorId().equals(userId)) {
-            throw new UnAuthorizedException("board를 변경할 권한이 없습니다.");
+            throw new AccessDeniedException("board를 변경할 권한이 없습니다.");
         }
 
         Board source = Board.builder()
@@ -58,7 +58,7 @@ public class BoardService {
                 .orElseThrow(() -> new ResourceNotFoundException("board", "id", boardId));
 
         if (!board.getAuthorId().equals(userId)) {
-            throw new UnAuthorizedException("board를 삭제할 권한이 없습니다.");
+            throw new AccessDeniedException("board를 삭제할 권한이 없습니다.");
         }
 
         boardRepository.delete(board);

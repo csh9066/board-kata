@@ -2,6 +2,8 @@ package boardkata.sever.web;
 
 import boardkata.sever.dto.ErrorResponse;
 import boardkata.sever.exception.AuthenticationException;
+import boardkata.sever.exception.ResourceNotFoundException;
+import boardkata.sever.exception.AccessDeniedException;
 import boardkata.sever.exception.UserEmailDuplicationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -23,6 +25,18 @@ public class ExceptionAdvice {
     @ExceptionHandler(AuthenticationException.class)
     public ErrorResponse handleAuthenticationException() {
         return new ErrorResponse("로그인 인증에 실패했습니다. 이메일이나 패스워드를 다시 한번 확인해주세요.");
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(AccessDeniedException.class)
+    public ErrorResponse handleAccessDeniedException() {
+        return new ErrorResponse("접근할 수 없는 요청입니다.");
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ErrorResponse handleResourceNotFoundException(ResourceNotFoundException e) {
+        return new ErrorResponse(e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

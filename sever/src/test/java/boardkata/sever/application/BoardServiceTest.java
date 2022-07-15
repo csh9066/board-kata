@@ -7,7 +7,7 @@ import boardkata.sever.domain.user.UserRepository;
 import boardkata.sever.dto.board.BoardCommandDto;
 import boardkata.sever.dto.board.BoardDto;
 import boardkata.sever.exception.ResourceNotFoundException;
-import boardkata.sever.exception.UnAuthorizedException;
+import boardkata.sever.exception.AccessDeniedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -168,7 +168,7 @@ class BoardServiceTest {
                 assertThatThrownBy(
                         () -> boardService.updateBoard(unAuthorizedUserId, boardId, boardCommandDto)
                 )
-                        .isInstanceOf(UnAuthorizedException.class);
+                        .isInstanceOf(AccessDeniedException.class);
             }
         }
     }
@@ -235,7 +235,7 @@ class BoardServiceTest {
             void it_throws_UnAuthorizedException() {
                 assertThatThrownBy(
                         () -> boardService.deleteBoard(unAuthorizedUserId, boardId)
-                ).isInstanceOf(UnAuthorizedException.class);
+                ).isInstanceOf(AccessDeniedException.class);
             }
         }
     }
