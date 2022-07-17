@@ -175,7 +175,7 @@ class BoardServiceTest {
 
     @Nested
     @DisplayName("deleteBoard 메소드는")
-    class Context_deleteBoard {
+    class Describe_deleteBoard {
 
         @Nested
         @DisplayName("정상적으로 메소드가 호출되었을 때 해당 board를 다시 조회하면")
@@ -236,6 +236,47 @@ class BoardServiceTest {
                 assertThatThrownBy(
                         () -> boardService.deleteBoard(unAuthorizedUserId, boardId)
                 ).isInstanceOf(AccessDeniedException.class);
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("getBoard 메소드는")
+    class Describe_getBoard {
+
+        @Nested
+        @DisplayName("board가 존재하면")
+        class Context_with_exists_board {
+            Board board;
+            Long boardId;
+
+            @BeforeEach
+            void setUp() {
+                board = aBoard();
+                boardId = board.getId();
+            }
+
+            @Test
+            @DisplayName("BoardDto를 반환한다.")
+            void it_returns_BoardDto() {
+                BoardDto boardDto = boardService.getBoard(boardId);
+
+                assertThat(boardDto.getId()).isEqualTo(boardId);
+                assertThat(boardDto.getTitle()).isEqualTo(board.getTitle());
+                assertThat(boardDto.getContent()).isEqualTo(board.getContent());
+            }
+        }
+
+        @Nested
+        @DisplayName("board가 존재하지 않으면")
+        class Context_with_not_exists_board {
+            final Long notExistsBoardId = 100L;
+
+            @Test
+            @DisplayName("BoardDto를 반환한다.")
+            void it_returns_BoardDto() {
+                assertThatThrownBy(() -> boardService.getBoard(notExistsBoardId))
+                        .isInstanceOf(ResourceNotFoundException.class);
             }
         }
     }

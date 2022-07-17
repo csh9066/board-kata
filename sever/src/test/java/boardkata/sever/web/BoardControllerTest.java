@@ -18,11 +18,13 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -30,11 +32,15 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ImportAutoConfiguration(WebSecurityConfig.class)
@@ -61,6 +67,17 @@ class BoardControllerTest {
                 .build();
     }
 
+    private BoardDto aBoardDto() {
+        return BoardDto.builder()
+                .id(1L)
+                .title("title")
+                .content("content")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .author(new BoardDto.Author(2L, "kmichi"))
+                .build();
+    }
+
     @Nested
     @DisplayName("POST /boards 요청은")
     class Describe_createBoard {
@@ -79,16 +96,7 @@ class BoardControllerTest {
                         .build();
 
                 given(boardService.createBoard(eq(userId), any(BoardCommandDto.class)))
-                        .willReturn(
-                                BoardDto.builder()
-                                        .id(1L)
-                                        .title("title")
-                                        .content("content")
-                                        .createdAt(LocalDateTime.now())
-                                        .updatedAt(LocalDateTime.now())
-                                        .author(new BoardDto.Author(2L, "kmichi"))
-                                        .build()
-                        );
+                        .willReturn(aBoardDto());
 
             }
 
@@ -149,16 +157,7 @@ class BoardControllerTest {
             @BeforeEach
             void setUp() {
                 given(boardService.updateBoard(eq(userId), eq(boardId), any(BoardCommandDto.class)))
-                        .willReturn(
-                                BoardDto.builder()
-                                        .id(1L)
-                                        .title("update Content")
-                                        .content("update Title")
-                                        .createdAt(LocalDateTime.now())
-                                        .updatedAt(LocalDateTime.now())
-                                        .author(new BoardDto.Author(2L, "kmichi"))
-                                        .build()
-                        );
+                        .willReturn(aBoardDto());
             }
 
             @WithMockAuthUser(id = 2L)
@@ -247,7 +246,7 @@ class BoardControllerTest {
 
             @WithAnonymousUser
             @Test
-            @DisplayName("")
+            @DisplayName("401 status를 응답한다.")
             void it_responses_401_status() throws Exception {
                 mockMvc.perform(put("/boards/{boardId}", boardId)
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -332,6 +331,103 @@ class BoardControllerTest {
             }
         }
     }
+
+    @Nested
+    @DisplayName("GET /boards 요청은")
+    class Describe_searchBoards {
+
+        @BeforeEach
+        void setUp() {
+            given(boardQueryDao.searchBoards(any(Pageable.class)))
+                    .willReturn(List.of(aBoardDto()));
+        }
+
+        @Test
+        @DisplayName("List 타입의 BoardDto를 반환한다")
+        void it_returns_BoardDtoList() throws Exception {
+
+            mockMvc.perform(
+                            get("/boards")
+                                    .param("page", "0")
+                                    .param("size", "10")
+                    )
+                    .andExpect(status().isOk())
+                    .andDo(document("get-boards",
+                            requestParameters(
+                                    parameterWithName("page").description("페이지"),
+                                    parameterWithName("size").description("사이즈(최대 30)")
+                            ),
+                            responseFields(
+                                    fieldWithPath("[].id").description("아이디"),
+                                    fieldWithPath("[].title").description("타이틀"),
+                                    fieldWithPath("[].content").description("컨텐츠"),
+                                    fieldWithPath("[].createdAt").description("생성된 날짜"),
+                                    fieldWithPath("[].updatedAt").description("변경된 날짜"),
+                                    fieldWithPath("[].author.id").description("작성자 아이디"),
+                                    fieldWithPath("[].author.nickname").description("작성자 닉네임")
+                            )
+                    ));
+        }
+
+        @Nested
+        @DisplayName("GET /boards/{id} 요청은")
+        class Describe_getBoard {
+
+            @Nested
+            @DisplayName("board가 존재하면")
+            class Context_with_exists_board {
+                @BeforeEach
+                void setUp() {
+                    given(boardService.getBoard(1L))
+                            .willReturn(aBoardDto());
+                }
+
+                @Test
+                @DisplayName("BoardDto를 응답한다.")
+                void it_responses_BoardDto() throws Exception {
+
+                    mockMvc.perform(
+                                    get("/boards/{boardId}", 1L)
+                            )
+                            .andExpect(status().isOk())
+                            .andDo(document("get-boards",
+                                    pathParameters(
+                                            parameterWithName("boardId").description("보드 아이디")
+                                    ),
+                                    responseFields(
+                                            fieldWithPath("id").description("아이디"),
+                                            fieldWithPath("title").description("타이틀"),
+                                            fieldWithPath("content").description("컨텐츠"),
+                                            fieldWithPath("createdAt").description("생성된 날짜"),
+                                            fieldWithPath("updatedAt").description("변경된 날짜"),
+                                            fieldWithPath("author.id").description("작성자 아이디"),
+                                            fieldWithPath("author.nickname").description("작성자 닉네임")
+                                    )
+                            ));
+                }
+            }
+
+            @Nested
+            @DisplayName("board가 존재하지 않으면")
+            class Context_with_not_exists_board {
+                final Long notExistsBoardId = 100L;
+
+                @BeforeEach
+                void setUp() {
+                    given(boardService.getBoard(notExistsBoardId))
+                            .willThrow(ResourceNotFoundException.class);
+                }
+
+                @Test
+                @DisplayName("404 status를 응답한다.")
+                void it_responses_404_status() throws Exception {
+                    mockMvc.perform(get("/boards/{boardId}", notExistsBoardId))
+                            .andExpect(status().isNotFound());
+                }
+            }
+        }
+    }
+
 }
 
 

@@ -34,8 +34,7 @@ public class BoardService {
     }
 
     public BoardDto updateBoard(Long userId, Long boardId, BoardCommandDto boardCommandDto) {
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new ResourceNotFoundException("board", "id", boardId));
+        Board board = findBoard(boardId);
 
         if (!board.getAuthorId().equals(userId)) {
             throw new AccessDeniedException("board를 변경할 권한이 없습니다.");
@@ -54,8 +53,7 @@ public class BoardService {
     }
 
     public void deleteBoard(Long userId, Long boardId) {
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new ResourceNotFoundException("board", "id", boardId));
+        Board board = findBoard(boardId);
 
         if (!board.getAuthorId().equals(userId)) {
             throw new AccessDeniedException("board를 삭제할 권한이 없습니다.");
@@ -63,4 +61,18 @@ public class BoardService {
 
         boardRepository.delete(board);
     }
+
+    public BoardDto getBoard(Long boardId) {
+        Board board = findBoard(boardId);
+
+        User author = userRepository.findById(board.getAuthorId()).get();
+
+        return BoardDto.of(board, author);
+    }
+
+    private Board findBoard(Long boardId) {
+        return boardRepository.findById(boardId)
+                .orElseThrow(() -> new ResourceNotFoundException("board", "id", boardId));
+    }
+
 }

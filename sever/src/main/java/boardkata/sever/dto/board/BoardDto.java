@@ -2,6 +2,7 @@ package boardkata.sever.dto.board;
 
 import boardkata.sever.domain.board.Board;
 import boardkata.sever.domain.user.User;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -35,6 +36,16 @@ public class BoardDto {
         this.author = author;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    @QueryProjection
+    public BoardDto(Board board, User user) {
+        this.id = board.getId();
+        this.title = board.getTitle();
+        this.content = board.getContent();
+        this.author = new Author(user.getId(), user.getNickname());
+        this.createdAt = board.getCreatedAt();
+        this.updatedAt = board.getUpdatedAt();
     }
 
     public static BoardDto of(Board board, User user) {
