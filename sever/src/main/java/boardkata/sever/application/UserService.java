@@ -9,7 +9,9 @@ import boardkata.sever.exception.UserEmailDuplicationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 @RequiredArgsConstructor
 @Service
 public class UserService {
@@ -39,6 +41,7 @@ public class UserService {
         return UserDto.of(user);
     }
 
+    @Transactional(readOnly = true)
     public UserDto getUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("user","id", id));

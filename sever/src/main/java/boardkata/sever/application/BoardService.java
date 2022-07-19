@@ -10,7 +10,9 @@ import boardkata.sever.exception.ResourceNotFoundException;
 import boardkata.sever.exception.AccessDeniedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 @RequiredArgsConstructor
 @Service
 public class BoardService {
@@ -62,6 +64,7 @@ public class BoardService {
         boardRepository.delete(board);
     }
 
+    @Transactional(readOnly = true)
     public BoardDto getBoard(Long boardId) {
         Board board = findBoard(boardId);
 
