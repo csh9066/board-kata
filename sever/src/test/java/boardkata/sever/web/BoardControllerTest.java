@@ -1,6 +1,7 @@
 package boardkata.sever.web;
 
 import boardkata.sever.application.BoardService;
+import boardkata.sever.dto.PageResponse;
 import boardkata.sever.dto.board.BoardCommandDto;
 import boardkata.sever.dto.board.BoardDto;
 import boardkata.sever.exception.AccessDeniedException;
@@ -339,12 +340,12 @@ class BoardControllerTest {
         @BeforeEach
         void setUp() {
             given(boardQueryDao.searchBoards(any(Pageable.class)))
-                    .willReturn(List.of(aBoardDto()));
+                    .willReturn(new PageResponse(List.of(aBoardDto()), 1L));
         }
 
         @Test
-        @DisplayName("List 타입의 BoardDto를 반환한다")
-        void it_returns_BoardDtoList() throws Exception {
+        @DisplayName("List 타입의 BoardDto가 있는 PageResponse를 반환한다")
+        void it_returns_PageResponse() throws Exception {
 
             mockMvc.perform(
                             get("/boards")
@@ -358,13 +359,14 @@ class BoardControllerTest {
                                     parameterWithName("size").description("사이즈(최대 30)")
                             ),
                             responseFields(
-                                    fieldWithPath("[].id").description("아이디"),
-                                    fieldWithPath("[].title").description("타이틀"),
-                                    fieldWithPath("[].content").description("컨텐츠"),
-                                    fieldWithPath("[].createdAt").description("생성된 날짜"),
-                                    fieldWithPath("[].updatedAt").description("변경된 날짜"),
-                                    fieldWithPath("[].author.id").description("작성자 아이디"),
-                                    fieldWithPath("[].author.nickname").description("작성자 닉네임")
+                                    fieldWithPath("results[].id").description("아이디"),
+                                    fieldWithPath("results[].title").description("타이틀"),
+                                    fieldWithPath("results[].content").description("컨텐츠"),
+                                    fieldWithPath("results[].createdAt").description("생성된 날짜"),
+                                    fieldWithPath("results[].updatedAt").description("변경된 날짜"),
+                                    fieldWithPath("results[].author.id").description("작성자 아이디"),
+                                    fieldWithPath("results[].author.nickname").description("작성자 닉네임"),
+                                    fieldWithPath("totalCount").description("총 아이템 수")
                             )
                     ));
         }

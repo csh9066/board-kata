@@ -1,6 +1,7 @@
 package boardkata.sever.web;
 
 import boardkata.sever.application.BoardService;
+import boardkata.sever.dto.PageResponse;
 import boardkata.sever.dto.board.BoardCommandDto;
 import boardkata.sever.dto.board.BoardDto;
 import boardkata.sever.query.BoardQueryDao;
@@ -57,7 +58,7 @@ public class BoardController {
     }
 
     @GetMapping
-    public List<BoardDto> searchBoards(@PageableDefault Pageable pageable) {
+    public PageResponse<BoardDto> searchBoards(@PageableDefault Pageable pageable) {
         return boardQueryDao.searchBoards(pageable);
     }
 

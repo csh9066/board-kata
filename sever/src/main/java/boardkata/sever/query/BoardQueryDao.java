@@ -1,5 +1,6 @@
 package boardkata.sever.query;
 
+import boardkata.sever.dto.PageResponse;
 import boardkata.sever.dto.board.BoardDto;
 import boardkata.sever.dto.board.QBoardDto;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -18,13 +19,22 @@ public class BoardQueryDao {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    public List<BoardDto> searchBoards(Pageable pageable) {
-        return jpaQueryFactory.select(new QBoardDto(board, user))
+    public PageResponse searchBoards(Pageable pageable) {
+        List<BoardDto> result = jpaQueryFactory.select(new QBoardDto(board, user))
                 .from(board)
                 .join(user).on(user.id.eq(board.authorId))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(board.createdAt.desc())
                 .fetch();
+
+        return new PageResponse(result, totalCount());
+    }
+
+    private Long totalCount() {
+        return jpaQueryFactory.select(board.count())
+                .from(board)
+                .join(user).on(user.id.eq(board.authorId))
+                .fetchOne();
     }
 }
