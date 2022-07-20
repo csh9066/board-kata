@@ -1,11 +1,10 @@
-import { Layout } from "antd";
-import Header from "../components/Header";
+import BoardList from "../components/BoardList";
+import DefaultTemplate from "../components/DefaultTemplate";
 
 export default function IndexPage() {
   return (
-    <Layout>
-      <Header />
-      <Layout.Content></Layout.Content>
-    </Layout>
+    <DefaultTemplate>
+      <BoardList />
+    </DefaultTemplate>
   );
 }

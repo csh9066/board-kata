@@ -43,7 +43,7 @@ function Header() {
         {isLoggedIn ? (
           <Space>
             <Button type="default" shape="round">
-              새 글 작성
+              <Link to="/write">새 글 작성</Link>
             </Button>
             <Dropdown overlay={menu(logout)}>
               <Space>
