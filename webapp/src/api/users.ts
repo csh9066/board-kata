@@ -6,9 +6,7 @@ export async function getMe() {
   try {
     const { data } = await api.get("/users/me");
     return data;
-  } catch (e) {
-    resolveAxiosError(e as Error, "로그인 요청 에러");
-  }
+  } catch (e) {}
 }
 
 export async function createUser(form: CreateUserData) {

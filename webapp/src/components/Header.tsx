@@ -26,7 +26,7 @@ function menu(logout: any) {
 }
 
 function Header() {
-  const { isLoggedIn, logout, me } = useAuth();
+  const { logout, me } = useAuth();
 
   return (
     <Layout.Header
@@ -40,7 +40,7 @@ function Header() {
         <Typography.Text strong>BOARD KATA</Typography.Text>
       </Link>
       <div>
-        {isLoggedIn ? (
+        {me ? (
           <Space>
             <Button type="default" shape="round">
               <Link to="/write">새 글 작성</Link>

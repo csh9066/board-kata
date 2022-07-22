@@ -19,7 +19,7 @@ export default function DefaultTemplate({ children }: Props) {
       >
         <div
           style={{
-            width: 768,
+            maxWidth: 768,
             margin: "0 auto",
           }}
         >
