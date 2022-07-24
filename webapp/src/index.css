@@ -1,0 +1,3 @@
+.ql-toolbar + .ql-toolbar {
+  display: none !important;
+}

@@ -12,16 +12,35 @@ export async function getBoards(page: number) {
   }
 }
 
+export async function getBoardDetail(id: number) {
+  try {
+    const { data } = await api.get<Board>(`/boards/${id}`);
+    return data;
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export async function createBoard(creationData: CreateBoardData) {
+  const { data } = await api.post<Board>(`/boards`, creationData);
+  return data;
+}
+
 export interface Board {
   id: number;
-  content: number;
-  title: number;
+  content: string;
+  title: string;
   author: BoardAuthor;
-  createdAt: String;
-  updatedAt: String;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface BoardAuthor {
   id: number;
   nickname: number;
+}
+
+export interface CreateBoardData {
+  title: string;
+  content: string;
 }
