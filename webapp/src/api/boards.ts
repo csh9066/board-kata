@@ -26,6 +26,10 @@ export async function createBoard(creationData: CreateBoardData) {
   return data;
 }
 
+export async function delteBoard(id: number) {
+  await api.delete(`/boards/${id}`);
+}
+
 export interface Board {
   id: number;
   content: string;
