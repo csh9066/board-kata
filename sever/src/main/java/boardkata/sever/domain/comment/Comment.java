@@ -59,6 +59,14 @@ public class Comment extends BaseTimeEntity {
         reply.setRoot(this);
     }
 
+    public void update(String content) {
+        this.content = content;
+    }
+
+    public boolean isAuthor(Long authorId) {
+        return this.authorId.equals(authorId);
+    }
+
     private void setRoot(Comment root) {
         this.root = root;
     }
