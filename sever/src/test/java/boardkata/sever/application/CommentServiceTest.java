@@ -4,7 +4,8 @@ import boardkata.sever.domain.board.Board;
 import boardkata.sever.domain.board.BoardRepository;
 import boardkata.sever.domain.comment.Comment;
 import boardkata.sever.domain.comment.CommentRepository;
-import boardkata.sever.dto.comment.CommentCommandDto;
+import boardkata.sever.dto.comment.CommentCreateDto;
+import boardkata.sever.dto.comment.CommentUpdateDto;
 import boardkata.sever.exception.AccessDeniedException;
 import boardkata.sever.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,7 +58,7 @@ class CommentServiceTest {
         class Context_when_right_arg {
             Long authorId;
             Long boardId;
-            CommentCommandDto commentCommandDto;
+            CommentCreateDto commentCreateDto;
 
             @BeforeEach
             void setUp() {
@@ -65,14 +66,13 @@ class CommentServiceTest {
 
                 boardId = boardSubject().getId();
 
-                commentCommandDto = new CommentCommandDto("content");
+                commentCreateDto = new CommentCreateDto("content", boardId);
             }
 
             @Test
             @DisplayName("생성된 boardId를 조회하면 생성된 걸 확인할 수 있다.")
             void it_saved_comment() {
-                Long id = commentService.createComment(boardId, authorId, commentCommandDto);
-
+                Long id = commentService.createComment(authorId, commentCreateDto);
                 Comment comment = commentRepository.findById(id).get();
 
                 assertThat(comment.getId()).isEqualTo(id);
@@ -85,7 +85,7 @@ class CommentServiceTest {
         class Context_when_not_exists_board {
             Long notExistsBoardId;
             Long authorId;
-            CommentCommandDto commentCommandDto;
+            CommentCreateDto commentCreateDto;
 
             @BeforeEach
             void setUp() {
@@ -93,14 +93,14 @@ class CommentServiceTest {
 
                 notExistsBoardId = 100L;
 
-                commentCommandDto = new CommentCommandDto("content");
+                commentCreateDto = new CommentCreateDto("content", notExistsBoardId);
             }
 
             @Test
             @DisplayName("ResourceNotFoundException 예외를 던진다.")
             void it_saved_comment() {
                 assertThatThrownBy(() -> commentService
-                        .createComment(notExistsBoardId, authorId, commentCommandDto)
+                        .createComment(authorId, commentCreateDto)
                 )
                         .isInstanceOf(ResourceNotFoundException.class);
             }
@@ -116,7 +116,7 @@ class CommentServiceTest {
         class Context_with_right_arg {
             Long commentId;
             Long userId;
-            CommentCommandDto commentCommandDto;
+            CommentUpdateDto commentUpdateDto;
 
             @BeforeEach
             void setUp() {
@@ -126,13 +126,13 @@ class CommentServiceTest {
 
                 commentId = comment.getId();
 
-                commentCommandDto = new CommentCommandDto("updatedTitle");
+                commentUpdateDto = new CommentUpdateDto("updatedTitle");
             }
 
             @Test
             @DisplayName("호출 후 조회하면 Comment가 변경된걸 확인할 수 있다.")
             void it_updates_comment() {
-                commentService.updateComment(commentId, userId, commentCommandDto);
+                commentService.updateComment(commentId, userId, commentUpdateDto);
 
                 Comment comment = commentRepository.findById(commentId).get();
 
@@ -145,7 +145,7 @@ class CommentServiceTest {
         class Context_when_comment_not_exists {
             Long notExistsCommentId;
             Long userId;
-            CommentCommandDto commentCommandDto;
+            CommentUpdateDto commentUpdateDto;
 
             @BeforeEach
             void setUp() {
@@ -153,14 +153,14 @@ class CommentServiceTest {
 
                 userId = 1L;
 
-                commentCommandDto = new CommentCommandDto("updatedTitle");
+                commentUpdateDto = new CommentUpdateDto("updatedTitle");
             }
 
             @Test
             @DisplayName("ResourceNotFoundException 예외를 던진다.")
             void it_throws_ResourceNotFoundException() {
                 assertThatThrownBy(() -> commentService
-                        .updateComment(notExistsCommentId, userId, commentCommandDto)
+                        .updateComment(notExistsCommentId, userId, commentUpdateDto)
                 )
                     .isInstanceOf(ResourceNotFoundException.class);
             }
@@ -171,7 +171,7 @@ class CommentServiceTest {
         class Context_when_not_access {
             Long commentId;
             Long notAccessUserId;
-            CommentCommandDto commentCommandDto;
+            CommentUpdateDto commentUpdateDto;
 
             @BeforeEach
             void setUp() {
@@ -179,7 +179,7 @@ class CommentServiceTest {
 
                 notAccessUserId = 100L;
 
-                commentCommandDto = new CommentCommandDto("updatedTitle");
+                commentUpdateDto = new CommentUpdateDto("updatedTitle");
             }
 
             @Test
@@ -187,7 +187,7 @@ class CommentServiceTest {
             void it_throws_AccessDeniedException() {
                 assertThatThrownBy(
                         () -> commentService
-                                .updateComment(commentId, notAccessUserId, commentCommandDto)
+                                .updateComment(commentId, notAccessUserId, commentUpdateDto)
                 )
                         .isInstanceOf(AccessDeniedException.class);
             }

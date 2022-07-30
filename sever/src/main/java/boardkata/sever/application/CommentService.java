@@ -3,7 +3,8 @@ package boardkata.sever.application;
 import boardkata.sever.domain.board.BoardRepository;
 import boardkata.sever.domain.comment.Comment;
 import boardkata.sever.domain.comment.CommentRepository;
-import boardkata.sever.dto.comment.CommentCommandDto;
+import boardkata.sever.dto.comment.CommentCreateDto;
+import boardkata.sever.dto.comment.CommentUpdateDto;
 import boardkata.sever.exception.AccessDeniedException;
 import boardkata.sever.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,8 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final BoardRepository boardRepository;
 
-    public Long createComment(Long boardId, Long authorId, CommentCommandDto commentCommandDto) {
+    public Long createComment(Long authorId, CommentCreateDto commentCreateDto) {
+        Long boardId = commentCreateDto.getBoardId();
         if (!boardRepository.existsById(boardId)) {
             throw new ResourceNotFoundException("board", "id", boardId);
         }
@@ -26,7 +28,7 @@ public class CommentService {
         Comment comment = Comment.builder()
                 .boardId(boardId)
                 .authorId(authorId)
-                .content(commentCommandDto.getContent())
+                .content(commentCreateDto.getContent())
                 .build();
 
         commentRepository.save(comment);
@@ -34,14 +36,14 @@ public class CommentService {
         return comment.getId();
     }
 
-    public void updateComment(Long commentId, Long userId, CommentCommandDto commentCommandDto) {
+    public void updateComment(Long commentId, Long userId, CommentUpdateDto commentUpdateDto) {
         Comment comment = findComment(commentId);
 
         if (!comment.isAuthor(userId)) {
             throw new AccessDeniedException("접근 권한이 없습니다.");
         }
-
-        comment.update(commentCommandDto.getContent());
+    
+        comment.update(commentUpdateDto.getContent());
     }
 
     public void deleteComment(Long commentId, Long userId) {
