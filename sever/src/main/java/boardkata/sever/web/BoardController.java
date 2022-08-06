@@ -7,6 +7,7 @@ import boardkata.sever.dto.board.BoardDto;
 import boardkata.sever.query.BoardQueryDao;
 import boardkata.sever.securituy.UserPrincipal;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -58,7 +59,7 @@ public class BoardController {
     }
 
     @GetMapping
-    public PageResponse<BoardDto> searchBoards(@PageableDefault Pageable pageable) {
+    public Page<BoardDto> searchBoards(@PageableDefault Pageable pageable) {
         return boardQueryDao.searchBoards(pageable);
     }
 

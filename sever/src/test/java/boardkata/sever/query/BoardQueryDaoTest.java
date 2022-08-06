@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import javax.persistence.EntityManager;
@@ -77,15 +78,16 @@ class BoardQueryDaoTest {
             }
 
             // 페이지는 0번째 부터 시작한다.
-            @DisplayName("1번째의 페이지인 10개의 PageResponse타입의 데이터가 반환된다.")
+            @DisplayName("1번째의 페이지인 10개의 Page타입인 데이터가 반환된다.")
             @Test
             void it_returns_PageResponse_List_of_size_10() {
-                PageResponse<BoardDto> pageResponse = boardQueryDao.searchBoards(pageable);
+                Page<BoardDto> page = boardQueryDao.searchBoards(pageable);
 
-                assertThat(pageResponse.getResults()).hasSize(10);
-                assertThat(pageResponse.getTotalCount()).isEqualTo(20);
+                assertThat(page.getSize()).isEqualTo(10);
+                assertThat(page.getTotalElements()).isEqualTo(20);
+                assertThat(page.getTotalPages()).isEqualTo(2);
                 // 생성된 기준으로 정렬 확인
-                assertThat(pageResponse.getResults()).element(0)
+                assertThat(page.getContent()).element(0)
                         .extracting("title")
                         .isEqualTo("title9");
             }
@@ -103,15 +105,16 @@ class BoardQueryDaoTest {
                 pageable = PageRequest.of(0, 20);
             }
 
-            @DisplayName("0번째의 페이지인 20개의 PageResponse타입의 데이터가 반환된다.")
+            @DisplayName("0번째의 페이지인 20개의 Page타입의 데이터가 반환된다.")
             @Test
             void it_returns_BoardDto_List_of_size_20() {
-                PageResponse<BoardDto> pageResponse = boardQueryDao.searchBoards(pageable);
+                Page<BoardDto> page = boardQueryDao.searchBoards(pageable);
 
-                assertThat(pageResponse.getResults()).hasSize(20);
-                assertThat(pageResponse.getTotalCount()).isEqualTo(20);
+                assertThat(page.getTotalElements()).isEqualTo(20);
+                assertThat(page.getSize()).isEqualTo(20);
+                assertThat(page.getTotalPages()).isEqualTo(1);
                 // 생성된 기준으로 정렬 확인
-                assertThat(pageResponse.getResults()).element(0)
+                assertThat(page.getContent()).element(0)
                         .extracting("title")
                         .isEqualTo("title19");
             }

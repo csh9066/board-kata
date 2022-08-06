@@ -19,6 +19,8 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -339,8 +341,9 @@ class BoardControllerTest {
 
         @BeforeEach
         void setUp() {
+            PageRequest pageRequest = PageRequest.of(0, 10);
             given(boardQueryDao.searchBoards(any(Pageable.class)))
-                    .willReturn(new PageResponse(List.of(aBoardDto()), 1L));
+                    .willReturn(new PageImpl<>(List.of(aBoardDto()), pageRequest, 1));
         }
 
         @Test
@@ -357,16 +360,6 @@ class BoardControllerTest {
                             requestParameters(
                                     parameterWithName("page").description("페이지"),
                                     parameterWithName("size").description("사이즈(최대 30)")
-                            ),
-                            responseFields(
-                                    fieldWithPath("results[].id").description("아이디"),
-                                    fieldWithPath("results[].title").description("타이틀"),
-                                    fieldWithPath("results[].content").description("컨텐츠"),
-                                    fieldWithPath("results[].createdAt").description("생성된 날짜"),
-                                    fieldWithPath("results[].updatedAt").description("변경된 날짜"),
-                                    fieldWithPath("results[].author.id").description("작성자 아이디"),
-                                    fieldWithPath("results[].author.nickname").description("작성자 닉네임"),
-                                    fieldWithPath("totalCount").description("총 아이템 수")
                             )
                     ));
         }
