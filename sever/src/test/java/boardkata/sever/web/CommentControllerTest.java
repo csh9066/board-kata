@@ -2,9 +2,11 @@ package boardkata.sever.web;
 
 import boardkata.sever.application.CommentService;
 import boardkata.sever.dto.comment.CommentCreateDto;
+import boardkata.sever.dto.comment.CommentDto;
 import boardkata.sever.dto.comment.CommentUpdateDto;
 import boardkata.sever.exception.AccessDeniedException;
 import boardkata.sever.exception.ResourceNotFoundException;
+import boardkata.sever.query.CommentQueryDao;
 import boardkata.sever.securituy.WebSecurityConfig;
 import boardkata.sever.security.WithMockAuthUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,18 +23,24 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ImportAutoConfiguration(WebSecurityConfig.class)
@@ -48,6 +56,9 @@ class CommentControllerTest {
 
     @MockBean
     private CommentService commentService;
+
+    @MockBean
+    private CommentQueryDao commentQueryDao;
 
     private CommentCreateDto aCommentCreateDto() {
         return new CommentCreateDto("content", 1L);
@@ -353,6 +364,46 @@ class CommentControllerTest {
                         )
                         .andExpect(status().isForbidden());
             }
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /comments?boardId={boardId} 요청은")
+    class Describe_getComments {
+
+        @BeforeEach
+        void setUp() {
+            CommentDto commentDto = CommentDto.builder()
+                    .id(1L)
+                    .author(new CommentDto.CommentAuthor(1L, "autor"))
+                    .content("content")
+                    .createdAt(LocalDateTime.now())
+                    .updatedAt(LocalDateTime.now())
+                    .build();
+
+            given(commentQueryDao.findComments(1L))
+                    .willReturn(List.of(commentDto));
+        }
+
+        @Test
+        @DisplayName("CommentDtoList를 응답한다.")
+        void it_responses_CommentDtoList() throws Exception {
+            mockMvc.perform(get("/comments")
+                            .param("boardId", "1"))
+                    .andExpect(status().isOk())
+                    .andDo(document("get-comments",
+                            requestParameters(
+                                    parameterWithName("boardId").description("보드 아이디")
+                            ),
+                            responseFields(
+                                    fieldWithPath("[].id").description("댓글 아이디"),
+                                    fieldWithPath("[].content").description("댓글 컨텐츠"),
+                                    fieldWithPath("[].createdAt").description("댓글 생성일"),
+                                    fieldWithPath("[].updatedAt").description("댓글 변경일"),
+                                    fieldWithPath("[].author.id").description("댓글 작성자 아이디"),
+                                    fieldWithPath("[].author.nickname").description("댓글 작성자 닉네임")
+                            )
+                    ));
         }
     }
 }
